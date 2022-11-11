@@ -15,8 +15,8 @@ import (
 
 const (
 	gScryptIterations int32 = 262144 // 2^18
-	gSaltSize         int   = 32     // 256 bits
-	gAesKeySize       int   = 32     // 256 bits
+	gSaltSize         int   = 32
+	gAesKeySize       int   = 32 // either 16, 24, or 32 bytes to select AES-128, AES-192, or AES-256.
 )
 
 // Note: Need authentication
@@ -41,12 +41,7 @@ func NewEncryptReader(plainInput io.Reader, password []byte) (io.Reader, error) 
 
 func newOfbStream(password []byte, m *MetaData) (cipher.Stream, error) {
 
-	aesKey, err := tool.MakeAesKey(password, m.Salt, int(m.ScryptIterations), gAesKeySize)
-	if err != nil {
-		return nil, err
-	}
-
-	block, err := aes.NewCipher(aesKey)
+	block, err := tool.MakeCipherBlock(password, m.Salt, int(m.ScryptIterations), gAesKeySize)
 	if err != nil {
 		return nil, err
 	}

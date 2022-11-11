@@ -47,13 +47,13 @@ func NewEncryptReaderVersion(version Version, plainInput io.Reader, password []b
 
 	maker, ok := encryptReaderMakers[version]
 	if !ok {
-		return nil, fmt.Errorf("can not find encryptReaderMaker for version: %v", PreferedVersion)
+		return nil, fmt.Errorf("can not find encryptReaderMaker for version: %v", version)
 	}
-	encReader, err := maker(plainInput, password)
+	verBytes, err := versionToBytes(version)
 	if err != nil {
 		return nil, err
 	}
-	verBytes, err := versionToBytes(version)
+	encReader, err := maker(plainInput, password)
 	if err != nil {
 		return nil, err
 	}
@@ -64,19 +64,18 @@ func NewEncryptWriter(encryptedOutput io.Writer, password []byte) (io.Writer, er
 	return NewEncryptWriterVersion(PreferedVersion, encryptedOutput, password)
 }
 
-// Note: it writes version (plain bytes) into encryptedOutput stream.
 func NewEncryptWriterVersion(version Version, encryptedOutput io.Writer, password []byte) (io.Writer, error) {
 
 	maker, ok := encryptWriterMakers[version]
 	if !ok {
-		return nil, fmt.Errorf("can not find encryptWriterMaker for version: %v", PreferedVersion)
+		return nil, fmt.Errorf("can not find encryptWriterMaker for version: %v", version)
 	}
 
-	v, err := versionToBytes(version)
+	verBytes, err := versionToBytes(version)
 	if err != nil {
 		return nil, err
 	}
-	_, err = encryptedOutput.Write(v)
+	_, err = encryptedOutput.Write(verBytes)
 	if err != nil {
 		return nil, err
 	}

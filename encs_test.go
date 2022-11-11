@@ -15,10 +15,10 @@ type testData struct {
 	err           error // expected error
 }
 
-const testDir = "test.test"
+const testDir = "test"
 
 var encryptFileTests = []testData{
-	{[]byte("hard to guess password"), testDir + "/input1.txt", nil},
+	{[]byte("hard to guess password"), testDir + "/plain1.txt", nil},
 }
 
 func TestEncryptAndDecryptFile(t *testing.T) {

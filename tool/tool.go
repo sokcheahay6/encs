@@ -2,6 +2,8 @@ package tool
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
 	"io"
@@ -39,6 +41,14 @@ func ReadInt32(r io.Reader) (b []byte, i int32, err error) {
 	return buf.Bytes(), i, err
 }
 
-func MakeAesKey(pass, salt []byte, iterations, aesKeySize int) ([]byte, error) {
-	return scrypt.Key(pass, salt, iterations, 8, 1, aesKeySize)
+func MakeAesKey(password, salt []byte, scryptIterations, aesKeySize int) ([]byte, error) {
+	return scrypt.Key(password, salt, scryptIterations, 8, 1, aesKeySize)
+}
+
+func MakeCipherBlock(password, salt []byte, iterations, aesKeySize int) (cipher.Block, error) {
+	aesKey, err := MakeAesKey(password, salt, iterations, aesKeySize)
+	if err != nil {
+		return nil, err
+	}
+	return aes.NewCipher(aesKey)
 }
